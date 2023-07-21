@@ -1,6 +1,6 @@
 const mongoose= require("mongoose");
 
-const tagSchema = new mongoose.Schema({
+const categorySchema = new mongoose.Schema({
     name:{
         type:String,
         required:true,
@@ -11,10 +11,12 @@ const tagSchema = new mongoose.Schema({
         type:String,
     },
     
-    course:{
+    course:[
+        {
         type:mongoose.Schema.Types.ObjectId,
         ref:"Course"
-    }
+         }
+    ]
 });
 
-module.exports = mongoose.Model("Tag", tagSchema);
+module.exports = mongoose.Model("Category", categorySchema);

@@ -74,7 +74,7 @@ exports.sendOTP = async (req,res)=>{
     }
 }
 
-
+// Sign Up Fn
 exports.signUp = async (req,res)=>{
     
     try{
@@ -131,7 +131,7 @@ exports.signUp = async (req,res)=>{
 
             //Hashing Password
 
-            const hashedPassword= await bcrypt.hjash(password,10);
+            const hashedPassword= await bcrypt.hash(password,10);
 
 
             // Saving User TO DB
@@ -204,10 +204,37 @@ exports.login = async(req,res)=>{
         if(bcrypt.compare(password,existingUser.password)){
 
             const payload={
-                email
+                email: existingUser.email,
+                id: existingUser._id,
+                role: existingUser.accountType
             }
-            jwt.sign(payload,process.env.JWT_SECRET,{
+            const token=jwt.sign(payload,process.env.JWT_SECRET,{
                 expiresIn:"2h"
+            })
+
+            existingUser.token = token;
+
+            existingUser.password= undefined;
+
+            // Create cookie and send as response
+
+            const options= {
+                expires: new Date(Date.now() + 3*24*60*60*1000),
+                httpOnly:true
+            }
+
+            res.cookie("authToken", token, options).status(200).
+            json({
+                success:true,
+                message:"Log In Succesfull"
+            })
+        }
+
+        else{
+            return res.status(401)
+            .json({
+                success:false,
+                message:"Password Incorrect"
             })
         }
     }catch(err){
@@ -217,5 +244,68 @@ exports.login = async(req,res)=>{
             message:"Internal Server Error"
         })
     }
+}
+
+// Change Password
+exports.changePassword = async(req,res)=>{
+    
+    try{
+    const {currentPassword, password, confirmPassword} = req.body;
+
+    const email = req.body.email;
+
+    if(!email || !currentPassword || !password || !confirmPassword){
+        return res.status(401)
+        .json({
+            success:false,
+            message:"Some Fields Are Msiing"
+        })
+    }
+
+    const userData= User.findOne({email});
+
+    if(!userData){
+        return res.status(401)
+        .json({
+            success:false,
+            message:"User Doesn't Exist"
+        })
+    }
+
+    if(bcrypt.compare(currentPassword, userData.password))
+    {
+        
+        if(password!=confirmPassword){
+            return res.status(400)
+            .json({
+                success:false,
+                message:"Password & Confirm Password Do Not Match"
+            })
+        }
+
+        const hashedPassword= await bcrypt.hash(password,10);
+
+        const response = await User.findOneAndUpdate({email},{password:hashedPassword});
+        
+
+    }
+
+    else{
+        return res.status(401).
+        json({
+           success:false,
+           message:"Current Password Do Not Match"
+        })
+    }
+
+    }catch(err){
+        return res.status(500).
+        json({
+           success:false,
+           message:"Internal Server Error"
+        })
+    }
+
+
 }
 

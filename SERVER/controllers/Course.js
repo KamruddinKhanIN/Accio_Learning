@@ -2,15 +2,16 @@ const Course= require ("../models/Course");
 const Category= require("../models/Category");
 const User= require("../models/User");
 const {uploadImageToCloudinary}= require("../utils/imageUploader");
+require("dotenv").config();
 
 
 exports.createCourse= async(req,res)=>{
       try{
-        const {courseName, courseDescription, whatYouWillLearn, price, category}= req.body;
+        const {courseName, courseDescription, whatYouWillLearn, price, category, tags}= req.body;
 
         const thumbnail= req.files.thumbnailImage;
 
-        if(!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !thumbnail){
+        if(!courseName || !courseDescription || !whatYouWillLearn || !price || !category || !thumbnail || !tags){
             return res.status(400)
             .json({
                 success:false,
@@ -44,7 +45,7 @@ exports.createCourse= async(req,res)=>{
 
         // Upload Image To Cloudinary
 
-        const thumbnailImage= await uploadImageToCloudinary(thumbnail, process.env.THUMBNAIL_FOLDER);
+        const thumbnailImage= await uploadImageToCloudinary(thumbnail, process.env.MEDIA_FOLDER);
 
 
         const newCourse= await Course.create({
@@ -54,6 +55,7 @@ exports.createCourse= async(req,res)=>{
             whatYouWillLearn,
             price,
             category:categoryDetails._id,
+            tags,
             thumbnail:thumbnailImage.secure_url
         })
 
@@ -112,6 +114,59 @@ exports.showAllCourses= async (req,res)=>{
         json({
             success:false,
             message:"Internal Server Error"
+        })
+    }
+}
+
+
+exports.getCourseDetails = async (req,res)=>{
+    try{
+        const {courseId}= req.body;
+
+        const courseDetails = await Course.findById(courseId)
+        .populate(
+            {
+                path:"instructor",
+                populate:{
+                    path:"additionalDetails"
+                }
+            }
+        )
+        .populate("category")
+        .populate(
+            {
+                path:"courseContent",
+                populate:{
+                    path:"subSection"
+                }
+            }
+        )
+        .populate("ratingsAndReviews").exec();
+     
+        
+        if(!courseDetails){
+            return res.status(404)
+            .json({
+                success:false,
+                message:"Could Not Find Course With Given CourseId"
+            })
+        }
+
+
+        return res.status(200)
+        .json({
+            success:true,
+            message:"Course Fetched Successfully",
+            err
+        })
+
+
+    }catch(err){
+        return res.status(500).
+        json({
+            success:false,
+            message:"Internal Server Error",
+            err
         })
     }
 }

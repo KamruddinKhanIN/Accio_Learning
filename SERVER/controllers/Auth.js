@@ -5,6 +5,9 @@ const otpGenerator=require("otp-generator");
 const bcrypt= require("bcrypt");
 const jwt= require("jsonwebtoken");
 const Profile = require("../models/Profile");
+const mailSender = require("../utils/mailer").mailSender;
+const {passwordUpdate} = require("../mail/templates/passwordUpdate")
+
 
 require("dotenv").config();
 
@@ -297,6 +300,28 @@ exports.changePassword = async(req,res)=>{
            message:"Current Password Do Not Match"
         })
     }
+
+
+    	// Send notification email
+		try {
+			const emailResponse = await mailSender(
+				updatedUserDetails.email,
+				passwordUpdate(
+					updatedUserDetails.email,
+					`Password updated successfully for ${updatedUserDetails.firstName} ${updatedUserDetails.lastName}`
+				)
+			);
+			console.log("Email sent successfully:", emailResponse.response);
+		} catch (error) {
+			// If there's an error sending the email, log the error and return a 500 (Internal Server Error) error
+			console.error("Error occurred while sending email:", error);
+			return res.status(500).json({
+				success: false,
+				message: "Error occurred while sending email",
+				error: error.message,
+			});
+		}
+
 
     }catch(err){
         return res.status(500).

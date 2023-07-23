@@ -1,6 +1,6 @@
-const mongoose= require("mongoose");
+const Mongoose= require("mongoose");
 
-const categorySchema = new mongoose.Schema({
+const categorySchema = new Mongoose.Schema({
     name:{
         type:String,
         required:true,
@@ -13,10 +13,10 @@ const categorySchema = new mongoose.Schema({
     
     course:[
         {
-        type:mongoose.Schema.Types.ObjectId,
+        type:Mongoose.Schema.Types.ObjectId,
         ref:"Course"
          }
     ]
 });
 
-module.exports = mongoose.Model("Category", categorySchema);
+module.exports = Mongoose.model("Category", categorySchema);

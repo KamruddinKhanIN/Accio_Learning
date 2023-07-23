@@ -1,7 +1,7 @@
-import RatingAndReview from "../models/RatingAndReview";
-import Course from "../models/Course";
-import User from "../models/User";
-import mongoose from "mongoose";
+const RatingAndReview = require("../models/RatingAndReview") ;
+const Course = require("../models/Course")  ;
+const User = require("../models/User") ;
+const mongoose = require("mongoose");
 
 
 
@@ -11,7 +11,10 @@ exports.createRating = async (req,res)=>{
 
        const userId= req.user.id;
 
-       const checkEnrollment = await User.findById(userId).courses.includes(course);
+       const checkEnrollment = await Course.findOne(
+        {_id:course,
+        studentsEnrolled: {$elemMatch: {$eq: userId} },
+    });
 
        if(!checkEnrollment){
         return res.status(404)
@@ -22,7 +25,8 @@ exports.createRating = async (req,res)=>{
        }
 
        const checkPreviouslyReviewed = await RatingAndReview.findOne({user:userId, course});
-
+       
+      
        if(checkPreviouslyReviewed){
         return res.status(403)
         .json({
@@ -53,7 +57,7 @@ exports.createRating = async (req,res)=>{
         .json({
             success:false,
             message:"Internal Server Error",
-            err
+            err:err.message
         })
     }
 }
@@ -107,7 +111,7 @@ exports.getAverageRating = async (req,res)=>{
         .json({
             success:false,
             message:"Internal Server Error",
-            err
+            err:err.message
         })
     }
 }
@@ -143,7 +147,7 @@ exports.getAllRating = async (req, res) => {
 }
 
 // get Specific Course Ratings
-exports.getAllRating = async (req, res) => {
+exports.getCourseRating = async (req, res) => {
     try{
 
         const {courseId} = req.body;

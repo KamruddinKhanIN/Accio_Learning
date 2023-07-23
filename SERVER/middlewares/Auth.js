@@ -47,7 +47,7 @@ exports.auth= async(req,res,next)=>{
 // isStudent Middleawre
 exports.isStudent= async (req, res, next)=>{
     try{
-      if(req.user.accountType !=="Student")
+      if(req.user.role !=="Student")
       {
         return res.status(401)
         .json({
@@ -69,12 +69,12 @@ exports.isStudent= async (req, res, next)=>{
 // isInstructor middleware
 exports.isInstructor= async (req, res, next)=>{
     try{
-      if(req.user.accountType !=="Instructor")
+      if(req.user.role !=="Instructor")
       {
         return res.status(401)
         .json({
             success:false,
-            message:"Not A Student"
+            message:"Not A Instructor"
         })
       }
 
@@ -91,12 +91,12 @@ exports.isInstructor= async (req, res, next)=>{
 // isAdmin middleware
 exports.isAdmin= async (req, res, next)=>{
     try{
-      if(req.user.accountType !=="Admin")
+      if(req.user.role !=="Admin")
       {
         return res.status(401)
         .json({
             success:false,
-            message:"Not A Student"
+            message:"Not A Admin"
         })
       }
 

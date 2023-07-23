@@ -1,9 +1,8 @@
-import {instance} from "../config/Razorpay";
-import Course from "../models/Course";
-import User from "../models/User";
-import {mailSender} from "../utils/mailer";
-import { courseEnrollmentEmail } from "../mail/templates/courseEnrollmentEmail";
-import { Mongoose } from "mongoose";
+const Course = require("../models/Course") ;
+const User = require("../models/User") ;
+const {mailSender} = require("../utils/mailer") ;
+const { courseEnrollmentEmail } = require("../mail/templates/courseEnrollmentEmail") ;
+const Mongoose= require("mongoose") ;
 
 // Capture The Payment and Initiate The Razorpay Payment\
 

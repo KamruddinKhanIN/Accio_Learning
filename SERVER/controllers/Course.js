@@ -7,7 +7,7 @@ require("dotenv").config();
 
 exports.createCourse= async(req,res)=>{
       try{
-        const {courseName, courseDescription, whatYouWillLearn, price, category, tags}= req.body;
+        let {courseName, courseDescription, whatYouWillLearn, price,status,  category, tags}= req.body;
 
         const thumbnail= req.files.thumbnailImage;
 
@@ -22,6 +22,21 @@ exports.createCourse= async(req,res)=>{
         // Check for instructor id
         const userID=req.user.id;
         const instructorID= userID;
+
+        if (!status || status === undefined) {
+			status = "Draft";
+		}
+		// Check if the user is an instructor
+		const instructorDetails = await User.findById(userID, {
+			accountType: "Instructor",
+		});
+
+		if (!instructorDetails) {
+			return res.status(404).json({
+				success: false,
+				message: "Instructor Details Not Found",
+			});
+		}
 
         console.log(instructorID);
 
@@ -51,7 +66,7 @@ exports.createCourse= async(req,res)=>{
         const newCourse= await Course.create({
             courseName,
             courseDescription,
-            instructor:instructorID._id,
+            instructor:instructorDetails._id,
             whatYouWillLearn,
             price,
             category:categoryDetails._id,
@@ -61,16 +76,18 @@ exports.createCourse= async(req,res)=>{
 
         // add the new course to userSchema of instructor
 
-        await User.findById({_id:instructorID._id},
+        await User.findByIdAndUpdate({_id:instructorDetails._id},
                             {
                                 $push:{
                                     courses:newCourse._id
                                 }
                             },
                             {new:true});
+
+                            
        
     //  Add course to category
-       await Category.findById({category},
+       await Category.findByIdAndUpdate({_id:categoryDetails._id},
                            {
                             $push:{
                                 course:newCourse._id
@@ -91,14 +108,20 @@ exports.createCourse= async(req,res)=>{
         .json({
             success:false,
             message:"Internal Server Error",
-            err
+            err:err.message
         })
       }
 };
 
 exports.showAllCourses= async (req,res)=>{
     try{
-      const allCourses= await Course.find({},{courseName:true, price:true, thumbnail:true, instructor:true}).populate("instructor");
+      const allCourses= await Course.find({},{courseName:true, price:true, thumbnail:true, instructor:true}).populate("instructor")
+      .populate({
+        path:"courseContent",
+        populate:{
+            path:"subSection"
+        }
+      });
 
       return res.status(200)
       .json({
@@ -142,6 +165,7 @@ exports.getCourseDetails = async (req,res)=>{
             }
         )
         .populate("ratingsAndReviews").exec();
+
      
         
         if(!courseDetails){
@@ -157,7 +181,7 @@ exports.getCourseDetails = async (req,res)=>{
         .json({
             success:true,
             message:"Course Fetched Successfully",
-            err
+            courseDetails
         })
 
 

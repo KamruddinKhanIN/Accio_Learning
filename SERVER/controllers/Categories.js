@@ -59,7 +59,7 @@ exports.categoryPageDetails = async(req,res)=>{
         // Get Category Id
         const {categoryId}= req.body;
 
-        const selectedCategory= await Category.findById(categoryId).populate("courses").exec();
+        const selectedCategory= await Category.findById(categoryId).populate("course").exec();
 
         if(!categoryId){
             return res.status(404)
@@ -72,11 +72,37 @@ exports.categoryPageDetails = async(req,res)=>{
         const differentCategories = await Category.find({
             _id: {$ne: categoryId},
             })
-            .populate("courses")
+            .populate("course")
             .exec();
 
         //get top 10 selling courses
         //HW - write it on your own 
+        const topSellingCourses = await Category.aggregate([
+            {
+              $match: {
+                _id: { $ne: categoryId }, // Exclude the specified categoryId
+              },
+            },
+            {
+              $unwind: "$course", // Unwind the 'course' array to work with individual courses
+            },
+            {
+              $sort: {
+                "course.studentsEnrolled": -1, // Sort by 'studentsEnrolled' field in 'course' subdocument
+              },
+            },
+            {
+              $group: {
+                _id: "$_id",
+                courses: { $push: "$course" }, // Group the courses back into an array
+              },
+            },
+            {
+              $project: {
+                courses: { $slice: ["$courses", 10] }, // Limit to the top 10 selling courses
+              },
+            },
+          ]);
         
         
         //return response
@@ -85,6 +111,7 @@ exports.categoryPageDetails = async(req,res)=>{
             data: {
                 selectedCategory,
                 differentCategories,
+                topSellingCourses
                   },
         });
     }catch(err)
@@ -93,7 +120,7 @@ exports.categoryPageDetails = async(req,res)=>{
         .json({
             success:false,
             message:"Internal Server Error",
-            err
+            err:err.message
         })
     }
 }

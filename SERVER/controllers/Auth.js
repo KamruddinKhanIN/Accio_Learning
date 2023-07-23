@@ -86,7 +86,7 @@ exports.signUp = async (req,res)=>{
         // Data Validation
 
         if(!firstName || !lastName || !email || !password || !confirmPassword
-            || !contactNo || !otp){
+            || !otp){
                 return res.status(403)
                 .json({
                     success:false,
@@ -113,7 +113,7 @@ exports.signUp = async (req,res)=>{
             }
 
             // Getting OTP From DB
-            const recentOtp= await OTP.find({email}).sort({createdAt:-1}).limit(1);
+            const recentOtp= await OTP.find({email}).sort({createdAt:-1}).limit(1).exec();
             console.log(recentOtp);
 
             if(recentOtp.length == 0){
@@ -124,11 +124,19 @@ exports.signUp = async (req,res)=>{
                 })
             }
 
-            if(otp !== recentOtp.otp){
+            if (recentOtp.length === 0) {
+                // OTP not found for the email
+                return res.status(400).json({
+                    success: false,
+                    message: "The OTP is not valid",
+                });
+            } 
+
+            if(otp !== recentOtp[0].otp){
                 return res.status(400)
                 .json({
                     success:false,
-                    message:"Invalid OTP"
+                    message:"OTP Not Match"
                 })
             }
 
@@ -194,7 +202,7 @@ exports.login = async(req,res)=>{
             })
         }
 
-        const existingUser= User.findOne({email});
+        const existingUser= await User.findOne({email}).populate("additionalDetails");
 
         if(!existingUser){
             return res.status(401).
@@ -204,7 +212,8 @@ exports.login = async(req,res)=>{
             })
         }
 
-        if(bcrypt.compare(password,existingUser.password)){
+
+        if(await bcrypt.compare(password,existingUser.password)){
 
             const payload={
                 email: existingUser.email,
@@ -244,7 +253,8 @@ exports.login = async(req,res)=>{
         res.status(500)
         .json({
             success:false,
-            message:"Internal Server Error"
+            message:"Internal Server Error",
+            err:err.message
         })
     }
 }

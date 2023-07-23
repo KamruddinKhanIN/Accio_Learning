@@ -1,6 +1,7 @@
 const User= require("../models/User");
-const mailSender = require("../utils/mailer").mailSender;
-const bcrypt= require("bcrypt");
+const mailSender = require("../utils/mailer");
+const bcrypt = require("bcrypt")
+const crypto = require("crypto")
 
 exports.resetPasswordToken= async (req,res)=>{
     try{
@@ -15,7 +16,7 @@ exports.resetPasswordToken= async (req,res)=>{
         })
     }
 
-    const userData= await findOne({email});
+    const userData= await User.findOne({email});
 
     if(!userData){
         return res.status(401)
@@ -25,12 +26,12 @@ exports.resetPasswordToken= async (req,res)=>{
         })
     }
     // Generate a token
-    const token= crypto.randomUUID;
+    const token= crypto.randomUUID();
 
     // Store token in DB
     const updatedDetails = await User.findOneAndUpdate({email},{
         token:token,
-        resetPasswordToken:Date.now()+ 5*60*1000
+        resetPasswordExpires:Date.now()+ 3600000,
     },{new:true});
 
     const url= `http://localhost:3000/update-password/${token}`;
@@ -47,7 +48,7 @@ exports.resetPasswordToken= async (req,res)=>{
         .json({
             success:false,
             messsage:"Internal Server Error",
-            err
+            err:err.message
         })
     }
 }
@@ -62,6 +63,13 @@ exports.resetPassword= async(req,res)=>{
             success:false,
             message:"Some Data Missing From Req Body"
         })
+    }
+
+    if (confirmPassword !== password) {
+        return res.json({
+            success: false,
+            message: "Password and Confirm Password Does not Match",
+        });
     }
 
 
@@ -85,7 +93,7 @@ exports.resetPassword= async(req,res)=>{
     }
 
     // Hash Pass
-    const hashedPassword= bcrypt(password,10);
+    const hashedPassword= await bcrypt.hash(password,10);
 
     // password update at db
     await User.findOneAndUpdate(
@@ -104,7 +112,7 @@ exports.resetPassword= async(req,res)=>{
       .json({
         success:false,
         message:"Internal Server Error",
-        err
+        err:err.message
       })
    }
 

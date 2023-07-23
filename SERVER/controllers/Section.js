@@ -1,5 +1,5 @@
-import Section from "../models/Section";
-import Course from "../models/Course";
+const Section = require("../models/Section") ;
+const Course = require("../models/Course") ;
 
 exports.createSection = async(req,res)=>{
     try{
@@ -23,7 +23,11 @@ exports.createSection = async(req,res)=>{
             }
         },
         {new:true}
-      ).populate("Section", populate("SubSection"));
+      ).populate({
+        path: "courseContent",
+        populate: {
+          path: "subSection",
+        }});
 
 
       return res.status(200)
@@ -39,7 +43,7 @@ exports.createSection = async(req,res)=>{
         .json({
             success:false,
             message:"Internal Server Error",
-            err
+            err:err.message
         })
     }
 }
@@ -56,7 +60,7 @@ exports.updateSection= async(req,res)=>{
             })
         }
 
-        const updatedSection= await Section.findByIdAndUpdate({sectionId},{sectionName:sectionName});
+        const updatedSection= await Section.findByIdAndUpdate({_id:sectionId},{sectionName:sectionName});
 
         return res.status(200)
         .json({
@@ -69,7 +73,7 @@ exports.updateSection= async(req,res)=>{
         .json({
             success:false,
             message:"Internal Server Error",
-            err
+            err:err.message
         })
     }
 };
@@ -78,9 +82,16 @@ exports.updateSection= async(req,res)=>{
 exports.deleteSection= async(req,res)=>{
     try{
         // This time we find id from req params in url
-        const {sectionId}= req.params;
+        const {sectionId, courseId}= req.body;
 
-        await Section.findByIdAndDelete({sectionId});
+        await Section.findByIdAndDelete({_id:sectionId});
+
+        await Course.findByIdAndUpdate({_id:courseId},
+            {
+                $pull:{
+                    courseContent:sectionId
+                }
+            })
 
         return res.status(200)
         .json({
@@ -92,7 +103,7 @@ exports.deleteSection= async(req,res)=>{
         .json({
             success:false,
             message:"Internal Server Error",
-            err
+            err:errr.message
         })
     }
 }

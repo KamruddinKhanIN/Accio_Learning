@@ -12,4 +12,11 @@
     opacity: 20%;
     position: relative;
     z-index: 10;
+    
+
+
+    }
+
+.homepage_bg{
+    background: url("../assets/Images/bghome.svg");
 }

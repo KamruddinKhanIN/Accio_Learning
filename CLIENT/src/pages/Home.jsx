@@ -6,6 +6,8 @@ import CTAButton from "../components/core/Homepage/CTAButton";
 import CodeBloacks from "../components/core/Homepage/CodeBloacks";
 import TimelineSection from "../components/core/Homepage/TimelineSection";
 import LearningLanguageSection from "../components/core/Homepage/LearningLanguageSection";
+import InstructorSection from "../components/core/Homepage/InstructorSection";
+import ExploreMore from "../components/core/Homepage/ExploreMore";
 import Banner from "../assets/Images/banner.mp4";
 import "./Home.css";
 import Footer from "../components/common/Footer";
@@ -63,6 +65,7 @@ const Home = () => {
 
         <div>
           <CodeBloacks
+          backgroundGradient={"background-blob-yellow"}
             position={"lg:flex-row"}
             heading={
               <div className="text-4xl font-semibold">
@@ -88,6 +91,7 @@ const Home = () => {
 
         <div>
           <CodeBloacks
+          backgroundGradient={"background-blob-blue"}
             position={"lg:flex-row-reverse"}
             heading={
               <div className="text-4xl font-semibold">
@@ -107,6 +111,8 @@ const Home = () => {
             codeColor={"text-yellow-25"}
           ></CodeBloacks>
         </div>
+
+        <ExploreMore/>
       </div>
 
       {/* Section 2 */}
@@ -127,7 +133,7 @@ const Home = () => {
         </div>
 
         <div
-          className=" mx-auto w-10/12 max-w-maxContent flex flex-col
+          className=" mx-auto w-11/12 max-w-maxContent flex flex-col
          items-center justify-between gap-5"
         >
           <div className=" flex flex-row gap-5 mb-10 mt-[150px]">
@@ -138,7 +144,7 @@ const Home = () => {
               </div>
             </div>
 
-            <div className=" flex flex-col gap-10 w-[45%] items-start">
+            <div className=" flex flex-col gap-10 w-[40%] items-start">
               <div className=" text-[16px] font-semibold">
                 The modern StudyNotion is the dictates its own terms. Today, to
                 be a competitive specialist requires more than professional
@@ -150,15 +156,23 @@ const Home = () => {
               </CTAButton>
             </div>
           </div>
+
+          <TimelineSection></TimelineSection>
+
+          <LearningLanguageSection></LearningLanguageSection>
         </div>
-
-
-        <TimelineSection></TimelineSection>
-
-        <LearningLanguageSection></LearningLanguageSection>
       </div>
 
       {/* Section 3 */}
+
+      <div className=" w-11/12 mx-auto max-w-maxContent flex-col items-center justify-between gap-8 first-letter bg-richblack-900 text-white mb-16">
+        <InstructorSection />
+
+        <h2 className="text-center text-4xl font-semobold mt-10 text-white">
+          Review from other learners
+        </h2>
+        {/* Review Slider here */}
+      </div>
 
       {/* Footer */}
 

@@ -7,7 +7,7 @@ import { FaArrowRight } from "react-icons/fa";
 const CodeBloacks = ({position, heading, subheading, ctabtn1,
 ctabtn2, codeblock, backgroundGradient, codeColor}) => {
   return (
-    <div className= {`flex ${position} my-20 justify-between gap-10 `}>
+    <div className= {`flex ${position} my-20 justify-between gap-10 items-center`}>
        {/* Section 1 */}
 
        <div className=' w-[50%] flex flex-col gap-8'>
@@ -35,9 +35,10 @@ ctabtn2, codeblock, backgroundGradient, codeColor}) => {
        <div className=' h-fit  flex flex-row text-10[px] w-[100%] py-4 lg:w-[500px]'> 
         {/*HW -> BG gradient*/}
 
-        {/* <div className="bg-gradient"></div> */}
+        <div className={` ${backgroundGradient}`}></div>
 
-        <div className='text-center flex flex-col w-[10%] text-richblack-400 font-inter font-bold '>
+        <div className=' absolute flex w-[45%] bg-transparent glass'>
+        <div className='text-center flex flex-col w-[10%] text-richblack-400 font-inter font-bold'>
             <p>1</p>
             <p>2</p>
             <p>3</p>
@@ -51,7 +52,7 @@ ctabtn2, codeblock, backgroundGradient, codeColor}) => {
             <p>11</p>
         </div>
 
-        <div className={`w-[90%] flex flex-col gap-2 font-bold font-mono ${codeColor} pr-2`}>
+        <div className={`w-[90%] flex flex-col gap-2 font-bold font-mono ${codeColor} pr-2 `}>
            <TypeAnimation
             sequence={[codeblock, 2000, ""]}
             repeat={Infinity}
@@ -66,6 +67,10 @@ ctabtn2, codeblock, backgroundGradient, codeColor}) => {
             omitDeletionAnimation={true}
            />
         </div>
+
+        </div>
+
+
 
 
 

@@ -8,10 +8,10 @@ import CourseCard from "./CourseCard";
 
 const tabsName = [
     "Free",
-    "New to coding",
-    "Most popular",
-    "Skills paths",
-    "Career paths",
+    "New to Coding",
+    "Most Popular",
+    "Skills Paths",
+    "Career Paths",
   ];
 
 const ExploreMore = () => {
@@ -60,7 +60,7 @@ const ExploreMore = () => {
       <div className=" flex flex-row absolute gap-10 justify-between items-center w-10/12">
         {courses.map((element,index)=>{
             return(
-                <CourseCard/>
+                <CourseCard key={index}/>
             )
         })}
       </div>

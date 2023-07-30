@@ -20,37 +20,38 @@ const Navbar = () => {
 
   const location = useLocation();
 
-  const subLinks = [
-    {
-      title: "web dev",
-      path: "/catalog/web-dev",
-    },
-    {
-      title: "python",
-      path: "/catalog/web-dev",
-    },
-    {
-      title: "android",
-      path: "/catalog/web-dev",
-    },
-  ];
+  // const subLinks = [
+  //   {
+  //     title: "web dev",
+  //     path: "/catalog/web-dev",
+  //   },
+  //   {
+  //     title: "python",
+  //     path: "/catalog/web-dev",
+  //   },
+  //   {
+  //     title: "android",
+  //     path: "/catalog/web-dev",
+  //   },
+  // ];
 
-  // const [subLinks, setsublinks] = useState([]);
+  const [subLinks, setsubLinks] = useState([]);
 
-  // const getSubLinks = async () => {
-  //   try {
-  //     console.log(categories.CATEGORIES_API)
-  //     const result = await apiConnector("GET", categories.CATEGORIES_API);
-  //     setsublinks(result?.data);
-  //     console.log(subLinks)
-  //   } catch (err) {
-  //     console.log("Could not fetch category list", err);
-  //   }
-  // };
+  const getSubLinks = async () => {
+    try {
+      console.log(categories.CATEGORIES_API);
+      const result = await apiConnector("GET", categories.CATEGORIES_API);
+      console.log(result);
+      setsubLinks(result?.data?.getAllCategories);
+      console.log(subLinks);
+    } catch (err) {
+      console.log("Could not fetch category list", err);
+    }
+  };
 
-  // useEffect(() => {
-  //   getSubLinks();
-  // },[]);
+  useEffect(() => {
+    getSubLinks();
+  }, []);
 
   const matchRoute = (route) => {
     return matchPath({ path: route }, location.pathname);
@@ -83,7 +84,7 @@ const Navbar = () => {
 
                       <div
                         className="invisible absolute left-[50%]
-                                    translate-x-[-50%] translate-y-[40%]
+                                    translate-x-[-50%] translate-y-[15%]
                                  top-[50%]
                                 flex flex-col rounded-md bg-richblack-5 p-4 text-richblack-900
                                 opacity-0 transition-all duration-200 z-50 group-hover:visible
@@ -97,8 +98,12 @@ const Navbar = () => {
 
                         {subLinks.length ? (
                           subLinks.map((subLink, index) => (
-                            <Link to={`${subLink.path}`} key={index} className=" text-richblack-700 text-[1.2rem]">
-                              <p>{subLink.title}</p>
+                            <Link
+                              to={`${subLink.path}`}
+                              key={subLink._id}
+                              className=" text-richblack-700 text-[1.2rem] my-1"
+                            >
+                              <p>{subLink.name}</p>
                             </Link>
                           ))
                         ) : (
